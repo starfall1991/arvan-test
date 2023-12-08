@@ -8,11 +8,19 @@ use App\Repositories\SizePerMonthRepository;
 
 class DatumService
 {
+    private array $user;
+
     public function __construct(
         protected RequestPerMinuteRepository $requestPerMinuteRepository,
         protected SizePerMonthRepository $sizePerMonthRepository,
         protected DatumRepository $datumRepository,
     ) {
+        $this->user = request()->attributes->get('user');
+    }
+
+    public function get(string $id): ?string
+    {
+        return $this->datumRepository->get($id);
     }
 
     public function cannotStore(int $size): bool
@@ -22,21 +30,16 @@ class DatumService
 
     private function notExceededRequestPerMinute(): bool
     {
-        $user = request()->attributes->get('user');
+        $userId = $this->user['id'];
+        $requestPerMinute = $this->user['size_per_month'];
 
-        return $this->requestPerMinuteRepository->get($user['id']) <= $user['request_per_minute'];
-    }
-
-    public function get(string $id): ?string
-    {
-        return $this->datumRepository->get($id);
+        return $this->requestPerMinuteRepository->get($userId) <= $requestPerMinute;
     }
 
     private function notExceededSizePerMonth(int $size): bool
     {
-        $user = request()->attributes->get('user');
-        $userId = $user['id'];
-        $maxSize = $user['size_per_month'];
+        $userId = $this->user['id'];
+        $maxSize = $this->user['size_per_month'];
 
         return ($this->sizePerMonthRepository->get($userId) + $size) <= $maxSize;
     }
@@ -45,9 +48,8 @@ class DatumService
     {
         // saving data ...
 
-        $user = request()->attributes->get('user');
-        $this->requestPerMinuteRepository->add($user['id']);
-        $this->sizePerMonthRepository->add($user['id'], $size);
+        $this->requestPerMinuteRepository->add($this->user['id']);
+        $this->sizePerMonthRepository->add($this->user['id'], $size);
         $this->datumRepository->add($id);
 
         return "data saved";
