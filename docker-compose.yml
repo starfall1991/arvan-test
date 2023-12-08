@@ -1,0 +1,53 @@
+version: '3'
+
+services:
+  laravel.arvan:
+    build:
+      context: ./docker/8.2
+      dockerfile: Dockerfile
+    image: laravel-8.2/arvan
+    container_name: arvan-laravel
+    working_dir: '/var/www'
+    restart: unless-stopped
+    volumes:
+      - '.:/var/www'
+    networks:
+      - net
+    depends_on:
+      - redis
+  redis:
+    image: 'redis:alpine'
+    container_name: arvan-redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - 'redis:/data'
+    networks:
+      - net
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 1m
+      retries: 3
+      timeout: 5s
+  web:
+    image: nginx:latest
+    container_name: arvan-nginx
+    restart: unless-stopped
+    ports:
+      - 8000:80
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./:/var/www
+    networks:
+      - net
+
+networks:
+  net:
+    driver: bridge
+volumes:
+  redis:
+    driver: local
