@@ -15,14 +15,19 @@ class DatumRepository
 
     public function get(string $id): ?string
     {
-        $userKey = "datum:$id";
+        $userKey = $this->generateUserKey($id);
         $datum = $this->model->get($userKey);
         return $datum === false ? null : $datum;
     }
 
+    private function generateUserKey(string $id): string
+    {
+        return "datum:$id";
+    }
+
     public function add(string $id): void
     {
-        $userKey = "datum:$id";
+        $userKey = $this->generateUserKey($id);
         $this->model->set($userKey, "data saved");
     }
 }
