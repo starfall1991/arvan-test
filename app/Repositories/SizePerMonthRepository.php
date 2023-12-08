@@ -16,16 +16,19 @@ class SizePerMonthRepository
 
     public function get(int $userId): int
     {
-        $month = now()->format("m");
-        $userKey = "user:uploads:$userId:$month";
-
+        $userKey = $this->createUserKey($userId);
         return (int)$this->model->get($userKey);
+    }
+
+    private function createUserKey(int $userId): string
+    {
+        $month = now()->format("m");
+        return "user:uploads:$userId:$month";
     }
 
     public function add(mixed $userId, int $size): void
     {
-        $month = now()->format("m");
-        $userKey = "user:uploads:$userId:$month";
+        $userKey = $this->createUserKey($userId);
         $this->model->incrby($userKey, $size);
 
         $ttl = Carbon::now()->diffInSeconds(now()->endOfMonth());
