@@ -1,0 +1,53 @@
+{
+  "info": {
+    "_postman_id": "6fa61a99-ef03-4074-8857-da9fdd6a665a",
+    "name": "arvan",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "22982833"
+  },
+  "item": [
+    {
+      "name": "store data",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json",
+            "type": "text"
+          },
+          {
+            "key": "Authorization",
+            "value": "3",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"id\": \"amin6\",\r\n    \"size\": \"5\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/data",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8000",
+          "path": [
+            "api",
+            "data"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
