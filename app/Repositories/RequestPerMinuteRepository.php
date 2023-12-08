@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Redis;
 class RequestPerMinuteRepository
 {
     protected $model;
-    protected int $timeFrame = 60;
+    protected int $timeFrameInSeconds = 60;
 
     public function __construct()
     {
@@ -16,24 +16,29 @@ class RequestPerMinuteRepository
 
     public function get(int $userId): int
     {
-        $userKey = 'user:rps:'.$userId;
-        $this->model->multi();
+        $userKey = $this->getUserKey($userId);
 
-        $this->model->zremrangebyscore($userKey, 0, time() - $this->timeFrame);
+        $this->model->multi();
+        $this->model->zremrangebyscore($userKey, 0, time() - $this->timeFrameInSeconds);
         $this->model->zcard($userKey);
         $response = $this->model->exec();
 
         return end($response);
     }
 
+    private function getUserKey($userId): string
+    {
+        return 'user:rps:'.$userId;
+    }
+
     public function add(mixed $userId): void
     {
-        $userKey = 'user:rps:'.$userId;
+        $userKey = $this->getUserKey($userId);
         $currentTime = time();
 
         $this->model->multi();
         $this->model->zadd($userKey, $currentTime, $currentTime);
-        $this->model->expire($userKey, $this->timeFrame + 1);
+        $this->model->expire($userKey, $this->timeFrameInSeconds + 1);
         $this->model->exec();
     }
 }
